@@ -1,0 +1,87 @@
+
+<!DOCTYPE html>  
+<meta charset="utf-8" />  
+<title>WebSocket Test
+</title>  
+<script language="javascript" type="text/javascript">  
+
+var wsUri = "ws://ws.blockchain.info/inv";
+
+var output;
+var total = 0;
+
+function init() {
+ output = document.getElementById("output");
+ testWebSocket();  
+}  
+
+function testWebSocket() {
+ websocket = new WebSocket(wsUri);
+ websocket.onopen = function(evt)    { onOpen(evt) };
+ websocket.onclose = function(evt)   { onClose(evt) };
+ websocket.onmessage = function(evt) { onMessage(evt) };
+ websocket.onerror = function(evt)   { onError(evt) };
+}  
+
+function onOpen(evt) {
+ //writeToScreen("CONNECTED");
+ websocket.send('{"op":"unconfirmed_sub"}');
+ //doSend("WebSocket rocks");
+}  
+
+function onClose(evt) {
+ //writeToScreen("DISCONNECTED");
+}  
+
+function onMessage(evt) {
+ //writeToScreen('<span style="color: blue;">RESPONSE: ' + evt.data+'</span>');
+ //console.log( JSON.parse(evt.data) )
+ var data = JSON.parse(evt.data)
+ 
+ var totalin = 0;
+ var totalout = 0;
+ 
+ for (var i in data.x.inputs) {
+ 	totalin += data.x.inputs[i].prev_out.value;
+ }
+ 
+ for (var o in data.x.out) {
+ 	totalout += data.x.out[o].value;
+ }
+ total += totalout;
+
+ //console.log(totalin-totalout)  //fees
+ console.log( data.x.hash )  //fees 
+ console.log( data.x.relayed_by )  //fees  
+ console.log( totalout/100000000 + "BTC (R"+totalout/100000000*4000+")" )
+ console.log("-----")
+
+
+output.innerHTML = data.x.hash;
+output2.innerHTML = data.x.relayed_by;
+output3.innerHTML = totalout/100000000 + "BTC (R"+totalout/100000000*4000+")";
+output4.innerHTML = "R"+total/100000000*4000;
+
+ //websocket.close();
+}  
+
+function onError(evt) {
+ //writeToScreen('<span style="color: red;">ERROR:</span> ' + evt.data); 
+}  
+
+function doSend(message) {
+ 
+ //websocket.send(message);
+}  
+
+
+
+window.addEventListener("load", init, false);
+
+</script>  
+<h2>WebSocket Test
+</h2>  
+<div id="output"></div>
+<div id="output2"></div>
+<div id="output3"></div>
+<div id="output4"></div>
